@@ -7,7 +7,7 @@ from pytz import timezone, UTC
 
 from werkzeug.urls import Href, url_encode, url_parse, url_unparse, url_encode
 from flask import Blueprint, render_template, url_for, abort, request, \
-    make_response, redirect, current_app, send_file, Response, redirect
+    make_response, redirect, current_app, send_file, Response, redirect, jsonify
 
 from arxiv import status
 from arxiv.users.auth.decorators import scoped
@@ -70,3 +70,13 @@ def authorize():
             logger.debug('User has not authorized client')
             grant_user = None
         return server.create_authorization_response(grant_user=grant_user)
+
+
+@blueprint.route('/assistant', methods=['POST'])
+@scoped(scopes.READ_PUBLIC)
+def assistant():
+    """Minimal AI assistant endpoint."""
+    payload = request.get_json(silent=True) or {}
+    message = payload.get('message', '') if isinstance(payload, dict) else ''
+    reply = f"AI assistant reply: {message}" if message else "AI assistant ready."
+    return jsonify({'reply': reply})

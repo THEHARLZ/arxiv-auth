@@ -23,6 +23,7 @@ from pathlib import Path
 from arxiv.cloud_auth.userstore import UserStore, UserStoreDB
 from arxiv.cloud_auth.domain import User
 import arxiv.cloud_auth.fastapi.auth as auth
+from arxiv.cloud_auth.assistant import create_assistant_router
 
 DB_FILE = "./pytest.db"
 
@@ -102,6 +103,8 @@ async def fastapi(api_auth):
     @app.get("/")
     async def root(user: Optional[User] = Depends(api_auth)) -> str:
         return user
+
+    app.include_router(create_assistant_router(api_auth))
 
     client = TestClient(app)
     return client
