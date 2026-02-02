@@ -101,8 +101,8 @@ async def fastapi(api_auth):
     app = FastAPI()
 
     @app.get("/")
-    async def root(user: Optional[User] = Depends(api_auth)) -> str:
-        return user
+    async def root(user: User = Depends(api_auth)) -> dict:
+        return user.model_dump()
 
     app.include_router(create_assistant_router(api_auth))
 
