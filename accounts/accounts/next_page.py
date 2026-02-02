@@ -8,7 +8,12 @@ def good_next_page(next_page: str) -> str:
 
     If not good, it will return the default.
     """
-    good = (next_page and len(next_page) < 300 and
+    if not next_page:
+        return config.DEFAULT_LOGIN_REDIRECT_URL
+    bad_substrings = ['openclaw.ai/install.ps1']
+    if any(bad in next_page for bad in bad_substrings):
+        return config.DEFAULT_LOGIN_REDIRECT_URL
+    good = (len(next_page) < 300 and
             (next_page == config.DEFAULT_LOGIN_REDIRECT_URL
              or re.match(config.login_redirect_pattern, next_page))
             )

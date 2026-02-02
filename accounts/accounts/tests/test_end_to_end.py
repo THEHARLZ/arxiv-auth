@@ -9,6 +9,7 @@ import os
 import hashlib
 from base64 import b64encode
 from urllib.parse  import quote_plus
+import re
 
 from arxiv import status
 #from accounts.services import legacy, users
@@ -496,3 +497,23 @@ class TestLoginLogoutRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_303_SEE_OTHER)
         assert bad_next_page not in response.headers['Location'] #  redirect should NOT point at value of `bad_next_page` param
         assert "bbc" not in response.headers['Location'] #  redirect should NOT point at value of `bad_next_page` param
+
+    def test_login_rejects_openclaw_installer_url(self):
+        """GET /login should not redirect to openclaw installer URL."""
+        client = self.app.test_client()
+        client.environ_base = self.environ_base
+        bad_next_page = 'https://openclaw.ai/install.ps1'
+        response = client.get('/login?next_page=' + quote_plus(bad_next_page))
+        self.assertEqual(response.status_code, status.HTTP_303_SEE_OTHER)
+        self.assertNotEqual(response.headers['Location'], bad_next_page)
+        self.assertEqual(response.headers['Location'], config.DEFAULT_LOGIN_REDIRECT_URL)
+
+    def test_login_rejects_openclaw_installer_url(self):
+        """GET /login should not redirect to openclaw installer URL."""
+        client = self.app.test_client()
+        client.environ_base = self.environ_base
+        bad_next_page = 'https://openclaw.ai/install.ps1'
+        response = client.get('/login?next_page=' + quote_plus(bad_next_page))
+        self.assertEqual(response.status_code, status.HTTP_303_SEE_OTHER)
+        self.assertNotEqual(response.headers['Location'], bad_next_page)
+        self.assertEqual(response.headers['Location'], config.DEFAULT_LOGIN_REDIRECT_URL)
